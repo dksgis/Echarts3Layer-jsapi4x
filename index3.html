@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Echarts3 柱状图、折线图、饼图-ArcGIS JS API 4.X版</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
+    <style>
+        html, body{
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #FFF;
+            overflow: hidden;
+            font-family: "Trebuchet MS", sans-serif;
+        }
+		#viewDiv {
+		  padding: 0;
+		  margin: 0;
+		  height: 100%;
+		  width: 100%;
+		}
+
+		#infoDiv {
+		  position: absolute;
+		  top: 15px;
+		  left: 60px;
+		}
+
+		#infoDiv input {
+		  border: none;
+		  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px;
+		}		
+    </style>
+</head>
+
+<body>
+<div id="viewDiv"></div>
+  <div id="infoDiv">
+    <input class="esri-component esri-widget-button esri-widget esri-interactive" type="button"
+      id="switch-btn" value="3D">
+  </div>
+<script src="./echarts3Layer/echarts3Extent.js"></script>
+<script>
+var package_path = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+    var dojoConfig = {
+        parseOnLoad: true,
+        packages: [{
+            "name": "src",
+            "location": package_path+"/echarts3Layer/"
+        }]
+    };
+</script>
+<script src="https://js.arcgis.com/4.6/"></script>
+<script>
+var map,view;
+require(["esri/Map", 'esri/views/MapView', "esri/views/SceneView", "src/Echarts3Layer", "dojo/domReady!"], function (Map, MapView, SceneView, Echarts3Layer) {
+	var switchButton = document.getElementById("switch-btn");
+	map = new Map({
+		basemap: "topo",
+		ground: "world-elevation"
+	});
+	view = new MapView({
+		map: map,
+		container: 'viewDiv',
+		scale: 9244648.86861805,
+		center: [110, 38]
+	})
+	
+	var markLineOpt = {
+		animation: false,
+		label: {
+			normal: {
+				formatter: 'y = 0.5 * x + 3',
+				textStyle: {
+					align: 'right'
+				}
+			}
+		},
+		lineStyle: {
+			normal: {
+				type: 'solid'
+			}
+		},
+		tooltip: {
+			formatter: 'y = 0.5 * x + 3'
+		},
+		data: [[{
+			coord: [0, 3],
+			symbol: 'none'
+		}, {
+			coord: [20, 13],
+			symbol: 'none'
+		}]]
+	};	
+	var options=[]
+	var option1 = {
+        title: {
+            text: 'ArcGIS 4.X 扩展Echarts3之柱状图、折线图、饼图等',
+            left: 'center',
+            textStyle: {
+                color: '#333'
+            }
+        },	
+		grid: [
+			{lat:35,lon:103, width: '38px', height: '38px'},
+			{lat:36,lon:108, width: '38px', height: '38px'},
+			{lat:39,lon:117, width: '38px', height: '38px'},
+			{lat:33,lon:117, width: '38px', height: '38px'},
+			{lat:40,lon:105, width: '38px', height: '38px'},
+		],
+		xAxis: [
+			{gridIndex: 0, type: 'category', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
+			{gridIndex: 1, type: 'category', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']},
+			{gridIndex: 4, min: 0, max: 20}
+		],
+		yAxis: [
+			{gridIndex: 0, type: 'value'},
+			{gridIndex: 1, type: 'value'},
+			{gridIndex: 4, min: 0, max: 15}
+		],
+		series: [
+			{
+				name: 'bar-simple',
+				type: 'bar',
+				xAxisIndex: 0,
+				yAxisIndex: 0,
+				data: [120, 200, 150, 80, 70, 110, 130],
+			},
+			{
+				name: 'line-simple',
+				type: 'line',
+				xAxisIndex: 1,
+				yAxisIndex: 1,
+				data: [820, 932, 901, 934, 1290, 1330, 1320],
+			},
+			{
+				name:'访问来源',
+				type:'pie',					
+				radius : '38px',
+				avoidLabelOverlap: false,
+				label: {
+					normal: {
+						show: false,
+						position: 'center'
+					},
+					emphasis: {
+						show: true,
+						textStyle: {
+							fontSize: '12',
+							fontWeight: 'bold'
+						}
+					}
+				},
+				labelLine: {
+					normal: {
+						show: false
+					}
+				},
+				data:[
+					{value:335, name:'直接访问'},
+					{value:310, name:'邮件营销'},
+					{value:234, name:'联盟广告'},
+					{value:135, name:'视频广告'},
+					{value:1548, name:'搜索引擎'}
+				]
+			},
+			{
+				name:'访问来源',
+				type:'pie',
+				radius : '38px',
+				data:[
+					{value:335, name:'直接访问'},
+					{value:310, name:'邮件营销'},
+					{value:274, name:'联盟广告'},
+					{value:235, name:'视频广告'},
+					{value:400, name:'搜索引擎'}
+				].sort(function (a, b) { return a.value - b.value; }),
+				roseType: 'radius',
+				itemStyle: {
+					normal: {
+						color: '#c23531',
+						shadowBlur: 200,
+						shadowColor: 'rgba(0, 0, 0, 0.5)'
+					}
+				}
+			},
+			{
+				name: 'IV',
+				type: 'scatter',
+				xAxisIndex: 2,
+				yAxisIndex: 2,
+				data: [
+					[8.0, 6.58],
+					[8.0, 5.76],
+					[8.0, 7.71],
+					[8.0, 8.84],
+					[8.0, 8.47],
+					[8.0, 7.04],
+					[8.0, 5.25],
+					[19.0, 12.50],
+					[8.0, 5.56],
+					[8.0, 7.91],
+					[8.0, 6.89]
+				],
+				markLine: markLineOpt
+			}
+		]
+	};	
+	options.push(option1)
+	view.when(function(){
+		initChart()
+	})
+	function initChart(){
+		options.forEach((option,index)=>{
+			var overlay = new Echarts3Layer(view, echarts,'chartId_'+index)
+			var chartsContainer = overlay.getEchartsContainer()
+			overlay.initECharts(chartsContainer)
+			overlay.setOption(option)			   
+		})
+	}
+	switchButton.onclick=function(){
+	    view.container = null;
+	    if(switchButton.value == "2D"){
+			view = new MapView({
+				map: map,
+				container: 'viewDiv',
+				scale: 9244648.86861805,
+				center: [110, 38]
+			})
+			switchButton.value='3D'
+		}else{
+			view = new SceneView({
+				map: map,
+				container: 'viewDiv',
+				scale: 9244648.86861805,
+				center: [110, 38]
+			})
+			switchButton.value='2D'
+		}
+		view.when(function(){
+			initChart()
+		})
+	}
+});
+</script>
+</body>
+</html>

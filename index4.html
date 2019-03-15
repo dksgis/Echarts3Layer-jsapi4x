@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Echarts3 热力图-ArcGIS JS API 4.X版</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
+    <style>
+        html, body{
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #FFF;
+            overflow: hidden;
+            font-family: "Trebuchet MS", sans-serif;
+        }
+		#viewDiv {
+		  padding: 0;
+		  margin: 0;
+		  height: 100%;
+		  width: 100%;
+		}
+
+		#infoDiv {
+		  position: absolute;
+		  top: 15px;
+		  left: 60px;
+		}
+
+		#infoDiv input {
+		  border: none;
+		  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px;
+		}		
+    </style>
+</head>
+
+<body>
+<div id="viewDiv"></div>
+  <div id="infoDiv">
+    <input class="esri-component esri-widget-button esri-widget esri-interactive" type="button"
+      id="switch-btn" value="3D">
+  </div>
+<script src="./echarts3Layer/jquery-1.11.3.min.js"></script>
+<script src="./echarts3Layer/echarts3Extent.js"></script>
+
+<script>
+var package_path = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+    var dojoConfig = {
+        parseOnLoad: true,
+        packages: [{
+            "name": "src",
+            "location": package_path+"/echarts3Layer/"
+        }]
+    };
+</script>
+<script src="https://js.arcgis.com/4.6/"></script>
+<script>
+var map,view,options=[];
+require(["esri/Map", 'esri/views/MapView', "esri/views/SceneView", "src/Echarts3Layer", "dojo/domReady!"], function (Map, MapView, SceneView, Echarts3Layer) {
+	var switchButton = document.getElementById("switch-btn");
+	map = new Map({
+		basemap: "dark-gray",
+		ground: "world-elevation"
+	});
+	view = new MapView({
+		map: map,
+		container: 'viewDiv',
+		zoom: 12,
+		center: [120.15785586158, 30.269122098642]
+	})
+	view.when(function(){
+		initChartOption()
+	})
+	
+	function initChartOption(){
+		$.get('data/hangzhou-tracks.json', function (data) {
+			var points = [].concat.apply([], data.map(function (track) {
+				return track.map(function (seg) {
+					return seg.coord.concat([1]);
+				});
+			}));
+			var option = {
+				title: {
+					text: 'ArcGIS 4.X 扩展Echarts3之热力图',
+					left: 'center',
+					textStyle: {
+						color: '#fff'
+					}
+				},			
+				animation: false,
+				geo: {
+					map: '',
+					show: false,
+					label: {
+						emphasis: {
+							show: false
+						}
+					},
+					left: 0,
+					top: 0,
+					right: 0,
+					bottom: 0,
+					roam: false,
+					itemStyle: {
+						normal: {
+							areaColor: '#323c48',
+							borderColor: '#111'
+						},
+						emphasis: {
+							areaColor: '#2a333d'
+						}
+					}
+				},
+				visualMap: {
+					show: false,
+					top: 'top',
+					min: 0,
+					max: 2,
+					seriesIndex: 0,
+					calculable: true,
+					inRange: {
+						color: ['blue', 'blue', 'green', 'yellow', 'red']
+					}
+				},
+				series: [{
+					type: 'heatmap',
+					coordinateSystem: 'geo',
+					data: points,
+					pointSize: 5,
+					blurSize: 6
+				}]
+			};
+			options.push(option)
+			initChart()			
+		});	
+	}
+	
+	function initChart(){
+		options.forEach((option,index)=>{
+			var overlay = new Echarts3Layer(view, echarts,'chartId_'+index)
+			var chartsContainer = overlay.getEchartsContainer()
+			overlay.initECharts(chartsContainer)
+			overlay.setOption(option)			   
+		})
+	}
+	switchButton.onclick=function(){
+	    view.container = null;
+	    if(switchButton.value == "2D"){
+			view = new MapView({
+				map: map,
+				container: 'viewDiv',
+				zoom: 12,
+				center: [120.15785586158, 30.269122098642]
+			})
+			switchButton.value='3D'
+		}else{
+			view = new SceneView({
+				map: map,
+				container: 'viewDiv',
+				zoom: 12,
+				center: [120.15785586158, 30.269122098642]
+			})
+			switchButton.value='2D'
+		}
+		view.when(function(){
+			initChart()
+		})
+	}
+});
+</script>
+</body>
+</html>
