@@ -55,7 +55,7 @@ define(["dojo/_base/declare", "dojo/_base/lang", "esri/geometry/Point", "esri/ge
                         e.grid.forEach(function(grid, index) {
                             var s = new n(grid.lon, grid.lat),
                                 i = o._map.toScreen(s);
-                            if (i) {
+                            if (i&&i.x&&i.y) {
                                 grid.x = i.x + 'px', grid.y = i.y + 'px'
                                 if (e.series[index].type == 'pie') {
                                     e.series[index].center = [i.x, i.y]
@@ -65,11 +65,11 @@ define(["dojo/_base/declare", "dojo/_base/lang", "esri/geometry/Point", "esri/ge
                     } else {
                         var s = new n(e.grid.lon, e.grid.lat),
                             i = o._map.toScreen(s);
-                        if (i) {
+                        if (i&&i.x&&i.y) {
                             e.grid.x = i.x + 'px', e.grid.y = i.y + 'px'
-                            e.series.forEach(function(s) {
-                                if (s.type == 'pie') {
-                                    s.center = [i.x, i.y]
+                            e.series.forEach(function(g) {
+                                if (g.type == 'pie') {
+                                    g.center = [i.x, i.y]
                                 }
                             })
                         }
