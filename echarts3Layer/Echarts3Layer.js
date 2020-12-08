@@ -87,6 +87,23 @@ define(["dojo/_base/declare", "dojo/_base/lang", "esri/geometry/Point", "esri/ge
                     o._resize();
                 }), o._map.on("resize", function() {
                     o._resize();
+                }), o._map.on("click", function(e) {
+                    var oEvent =new MouseEvent("click", {
+                        'bubbles': true,
+                        'cancelable': true,
+                        'view': window,
+                        'detail': 0,
+                        'screenX': e.native.screenX,
+                        'screenY': e.native.screenY,
+                        'clientX': e.native.clientX,
+                        'clientY': e.native.clientY,
+                        'ctrlKey': false,
+                        'altKey': false,
+                        'shiftKey': false,
+                        'metaKey': false,
+                        'button': 0,
+                    })                           
+                    o._ec.getDom().children[0].children[0].dispatchEvent(oEvent)
                 });
                 if (o._map.type == '3d') {
                     o._ec.getZr().on("mousedown", function(e) {
